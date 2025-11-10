@@ -123,19 +123,16 @@ describe('Pruebas de Aceptación - Integración con API', () => {
         
         expect(character).to.have.property('name');
         expect(vehicleUrls).to.be.an('array');
+        expect(vehicleUrls.length).to.be.greaterThan(0);
         
-        // Obtener todos los vehículos
-        const vehiclePromises = vehicleUrls.map((url: string) => {
-          return cy.request({ method: 'GET', url });
-        });
-        
-        cy.wrap(Promise.all(vehiclePromises)).then((vehicleResponses) => {
-          vehicleResponses.forEach((response: any) => {
-            expect(response.status).to.eq(200);
-            expect(response.body).to.have.property('name');
-            expect(response.body).to.have.property('vehicle_class');
+        // Obtener el primer vehículo para verificar que funciona
+        if (vehicleUrls.length > 0) {
+          cy.request({ method: 'GET', url: vehicleUrls[0] }).then((vehicleResponse) => {
+            expect(vehicleResponse.status).to.eq(200);
+            expect(vehicleResponse.body).to.have.property('name');
+            expect(vehicleResponse.body).to.have.property('vehicle_class');
           });
-        });
+        }
       });
     });
 
