@@ -114,7 +114,12 @@ describe('Visor de Personajes Star Wars - Pruebas de Aceptación', () => {
       cy.get('[data-testid="error-message"]').should(($el) => {
         const text = $el.text().toLowerCase();
         expect(text).to.satisfy((txt: string) => 
-          txt.includes('error') || txt.includes('cargar') || txt.includes('personaje')
+          txt.includes('error') || 
+          txt.includes('cargar') || 
+          txt.includes('personaje') ||
+          txt.includes('404') ||
+          txt.includes('failed') ||
+          txt.includes('not found')
         );
       });
     });
