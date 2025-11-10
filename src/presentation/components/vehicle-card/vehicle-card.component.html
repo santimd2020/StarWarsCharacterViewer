@@ -1,0 +1,48 @@
+<div class="vehicle-card" data-testid="vehicle-card">
+  <h3 class="vehicle-name">{{ vehicle.name }}</h3>
+  <div class="vehicle-info">
+    <div class="info-row">
+      <span class="info-label">Modelo:</span>
+      <span class="info-value">{{ vehicle.model }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Fabricante:</span>
+      <span class="info-value">{{ vehicle.manufacturer }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Clase:</span>
+      <span class="info-value">{{ vehicle.vehicle_class }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Costo:</span>
+      <span class="info-value">
+        {{ vehicle.cost_in_credits !== 'unknown' ? vehicle.cost_in_credits + ' créditos' : 'Desconocido' }}
+      </span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Longitud:</span>
+      <span class="info-value">{{ vehicle.length }} m</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Velocidad máxima:</span>
+      <span class="info-value">
+        {{ vehicle.max_atmosphering_speed !== 'unknown' ? vehicle.max_atmosphering_speed + ' km/h' : 'Desconocida' }}
+      </span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Tripulación:</span>
+      <span class="info-value">{{ vehicle.crew }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Pasajeros:</span>
+      <span class="info-value">{{ vehicle.passengers }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Capacidad de carga:</span>
+      <span class="info-value">{{ vehicle.cargo_capacity }} kg</span>
+    </div>
+  </div>
+</div>
+
+
+

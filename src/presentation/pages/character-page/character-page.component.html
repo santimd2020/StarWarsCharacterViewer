@@ -1,0 +1,50 @@
+<div class="character-page">
+  <header class="page-header">
+    <h1 class="page-title">Visor de Personajes Star Wars</h1>
+    <div class="search-container">
+      <label for="character-id" class="search-label">
+        ID del Personaje:
+      </label>
+      <input
+        id="character-id"
+        type="text"
+        [(ngModel)]="characterId"
+        (ngModelChange)="onIdChange()"
+        class="search-input"
+        placeholder="Ingresa un ID (1-83)"
+        data-testid="character-id-input"
+      />
+    </div>
+  </header>
+
+  <main class="page-content">
+    <app-loading-spinner *ngIf="loading"></app-loading-spinner>
+    
+    <app-error-message 
+      *ngIf="error && !loading" 
+      [message]="error" 
+      (retry)="onRetry()">
+    </app-error-message>
+    
+    <div *ngIf="data && !loading && !error" class="content-wrapper">
+      <app-character-card [character]="data.character"></app-character-card>
+      
+      <section *ngIf="data.vehicles.length > 0" class="vehicles-section">
+        <h2 class="vehicles-title">Vehículos</h2>
+        <div class="vehicles-grid">
+          <app-vehicle-card 
+            *ngFor="let vehicle of data.vehicles; trackBy: trackByVehicleUrl"
+            [vehicle]="vehicle">
+          </app-vehicle-card>
+        </div>
+      </section>
+      
+      <div *ngIf="data.vehicles.length === 0" class="no-vehicles" data-testid="no-vehicles">
+        <p>Este personaje no tiene vehículos asociados.</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+
+
