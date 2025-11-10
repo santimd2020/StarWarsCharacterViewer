@@ -28,14 +28,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y bc
+
       - name: Run linter
         run: npm run lint
 
-      - name: Run unit tests
-        run: npm run test
-
-      - name: Generate coverage report
-        run: npm run test:coverage
+      - name: Run unit tests with coverage
+        run: npm run test:coverage -- --watch=false --browsers=ChromeHeadless
 
       - name: Upload coverage to artifacts
         uses: actions/upload-artifact@v4
@@ -46,14 +46,32 @@ jobs:
 
       - name: Check coverage threshold
         run: |
-          npm run test:coverage > coverage-output.txt 2>&1 || true
-          COVERAGE=$(grep -oP 'All files\s+\|\s+\d+\.\d+%' coverage-output.txt | grep -oP '\d+\.\d+' | head -1 || echo "0")
-          if [ -z "$COVERAGE" ] || (( $(echo "$COVERAGE < 70" | bc -l) )); then
-            echo "Coverage $COVERAGE% is below 70% threshold"
-            cat coverage-output.txt
+          COVERAGE_FILE="./coverage/star-wars-character-viewer/coverage-summary.json"
+          if [ -f "$COVERAGE_FILE" ]; then
+            STATEMENTS=$(node -p "require('$COVERAGE_FILE').total.statements.pct")
+            BRANCHES=$(node -p "require('$COVERAGE_FILE').total.branches.pct")
+            FUNCTIONS=$(node -p "require('$COVERAGE_FILE').total.functions.pct")
+            LINES=$(node -p "require('$COVERAGE_FILE').total.lines.pct")
+            
+            echo "Coverage Summary:"
+            echo "  Statements: ${STATEMENTS}%"
+            echo "  Branches: ${BRANCHES}%"
+            echo "  Functions: ${FUNCTIONS}%"
+            echo "  Lines: ${LINES}%"
+            
+            if (( $(echo "$STATEMENTS < 70" | bc -l) )) || \
+               (( $(echo "$BRANCHES < 70" | bc -l) )) || \
+               (( $(echo "$FUNCTIONS < 70" | bc -l) )) || \
+               (( $(echo "$LINES < 70" | bc -l) )); then
+              echo "❌ Coverage is below 70% threshold"
+              exit 1
+            else
+              echo "✅ Coverage meets the 70% threshold"
+            fi
+          else
+            echo "❌ Coverage file not found"
             exit 1
           fi
-          echo "Coverage $COVERAGE% meets the 70% threshold"
 
   e2e:
     name: E2E Tests
@@ -72,20 +90,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Cypress
-        run: npm install cypress --save-dev
+      - name: Install Cypress dependencies
+        run: npm install wait-on --save-dev
 
       - name: Build application
         run: npm run build
 
       - name: Start application
-        run: npm run start &
+        run: |
+          npm run start &
+          sleep 10
         env:
           PORT: 4200
 
       - name: Wait for application
         run: |
-          timeout 60 bash -c 'until curl -f http://localhost:4200; do sleep 2; done'
+          npx wait-on http://localhost:4200 --timeout 60000 || curl -f http://localhost:4200
 
       - name: Run E2E tests
         run: npm run test:e2e
